@@ -57,9 +57,9 @@ void setup()
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   fsm.add_transition(&state_led_off, &state_led_on,
-                     BUTTON_EVENT, NULL);
-  fsm.add_timed_transition(&state_led_on, &state_led_off, 3000, NULL);
-  fsm.add_transition(&state_led_on, &state_led_off, BUTTON_EVENT, NULL);
+                     BUTTON_EVENT, NULL, "button_off_to_on");
+  fsm.add_timed_transition(&state_led_on, &state_led_off, 3000, NULL, "timeout_on_to_off");
+  fsm.add_transition(&state_led_on, &state_led_off, BUTTON_EVENT, NULL, "button_on_to_off");
   Serial.println("Setup END");
 }
 
