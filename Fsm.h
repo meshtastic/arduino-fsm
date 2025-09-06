@@ -49,19 +49,31 @@ struct TimedTransition
 
 #define MAX_TIMED_TRANSITIONS 8
 
+// Maximum number of regular transitions
+// Can be overridden at compile time: -DMAX_TRANSITIONS=128
+// Fixed-size array prevents memory leaks and fragmentation
+#ifndef MAX_TRANSITIONS
+#define MAX_TRANSITIONS 128
+#endif
+
 class Fsm
 {
 public:
   Fsm(State *initial_state);
   ~Fsm();
 
-  void add_transition(State *state_from, State *state_to, int event,
+  // Add a transition between states
+  // Returns true on success, false if transition array is full
+  bool add_transition(State *state_from, State *state_to, int event,
                       void (*on_transition)(), const char *name);
 
   TimedTransition *add_timed_transition(State *state_from, State *state_to,
                             unsigned long interval, void (*on_transition)(), const char *name);
 
   State *getState() const { return m_current_state; }
+  int getNumTransitions() const { return m_num_transitions; }
+  int getMaxTransitions() const { return MAX_TRANSITIONS; }
+  int getAvailableTransitions() const { return MAX_TRANSITIONS - m_num_transitions; }
 
   void check_timed_transitions();
 
@@ -76,7 +88,7 @@ private:
 
 private:
   State *m_current_state;
-  Transition *m_transitions;
+  Transition m_transitions[MAX_TRANSITIONS];
   int m_num_transitions;
 
   TimedTransition m_timed_transitions[MAX_TIMED_TRANSITIONS];
